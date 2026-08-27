@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Editor de tema — Ticket Bot</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  :root {
+    --bg: #313338;
+    --bg-secondary: #2b2d31;
+    --bg-tertiary: #1e1f22;
+    --bg-card: #383a40;
+    --text: #f2f3f5;
+    --text-muted: #949ba4;
+    --accent: #5865f2;
+    --accent-hover: #4752c4;
+    --border: #3f4147;
+    --success: #23a55a;
+    --danger: #da373c;
+    --btn-primary: #5865f2;
+    --btn-secondary: #4e5058;
+    --btn-success: #248046;
+    --btn-danger: #da373c;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "gg sans", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg-tertiary);
+    color: var(--text);
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+  }
+  a { color: var(--accent); }
+
+  #sidebar {
+    width: 260px;
+    flex-shrink: 0;
+    background: var(--bg-secondary);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+  }
+  #sidebar header {
+    padding: 18px 16px 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  #sidebar h1 { font-size: 15px; margin: 0 0 4px; }
+  #sidebar .guild { font-size: 12px; color: var(--text-muted); }
+  #catlist { list-style: none; margin: 0; padding: 8px; flex: 1; }
+  #catlist li { margin-bottom: 2px; }
+  #catlist button {
+    width: 100%;
+    text-align: left;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    padding: 9px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13.5px;
+  }
+  #catlist button:hover { background: #35373c; color: var(--text); }
+  #catlist button.active { background: var(--accent); color: #fff; }
+  #catlist .count { float: right; opacity: 0.7; font-size: 11px; }
+  #sidebar footer { padding: 12px; border-top: 1px solid var(--border); }
+
+  #main { flex: 1; overflow-y: auto; padding: 24px 32px 64px; }
+  #main-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+  #main-header h2 { margin: 0; font-size: 20px; }
+  #cards { display: flex; flex-direction: column; gap: 14px; max-width: 760px; }
+
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 18px;
+  }
+  .card-label { font-weight: 600; font-size: 14px; margin-bottom: 10px; }
+  .field-row { display: flex; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; align-items: flex-start; }
+  .field-row.col { flex-direction: column; }
+  input[type=text], textarea {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 4px;
+    padding: 8px 10px;
+    font-size: 13.5px;
+    font-family: inherit;
+    flex: 1;
+    min-width: 160px;
+  }
+  textarea { resize: vertical; min-height: 60px; width: 100%; }
+  input[type=text]:focus, textarea:focus { outline: none; border-color: var(--accent); }
+  input[type=color] {
+    width: 42px; height: 34px; padding: 0; border: 1px solid var(--border); border-radius: 4px; background: none; cursor: pointer;
+  }
+  .hex-input { width: 100px; flex: 0 0 auto; }
+
+  .btn {
+    background: var(--btn-secondary);
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 7px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .btn:hover { filter: brightness(1.1); }
+  .btn.primary { background: var(--accent); }
+  .btn.primary:hover { background: var(--accent-hover); }
+  .btn.danger { background: var(--btn-danger); }
+  .btn.small { padding: 5px 10px; font-size: 12px; }
+
+  .card-actions { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+  .status-msg { font-size: 12px; }
+  .status-msg.ok { color: var(--success); }
+  .status-msg.err { color: var(--danger); }
+
+  .preview-box { margin-top: 12px; padding: 10px 12px; background: var(--bg-tertiary); border-radius: 6px; border-left: 3px solid var(--accent); font-size: 13px; white-space: pre-wrap; word-break: break-word; }
+  .preview-label { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted); margin-bottom: 8px; }
+
+  .emoji-inline { width: 18px; height: 18px; vertical-align: -4px; margin-right: 4px; }
+
+  .discord-btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 4px; font-size: 13px; font-weight: 500; color: #fff; cursor: default; }
+  .discord-btn.style-Primary { background: var(--btn-primary); }
+  .discord-btn.style-Secondary { background: var(--btn-secondary); }
+  .discord-btn.style-Success { background: var(--btn-success); }
+  .discord-btn.style-Danger { background: var(--btn-danger); }
+  .discord-btn img.emoji-inline { margin-right: 0; }
+
+  .emoji-picker-wrap { position: relative; }
+  .emoji-popover {
+    position: absolute; z-index: 20; top: 40px; left: 0;
+    width: 280px; max-height: 260px; overflow-y: auto;
+    background: var(--bg-tertiary); border: 1px solid var(--border); border-radius: 6px; padding: 8px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    display: none;
+  }
+  .emoji-popover.open { display: block; }
+  .emoji-popover .none-opt { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 4px; cursor: pointer; font-size: 13px; }
+  .emoji-popover .none-opt:hover { background: var(--bg-card); }
+  .emoji-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; margin: 6px 0; }
+  .emoji-grid button { background: none; border: 1px solid transparent; border-radius: 4px; padding: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .emoji-grid button:hover { background: var(--bg-card); border-color: var(--border); }
+  .emoji-grid img { width: 24px; height: 24px; }
+  .emoji-popover .manual { border-top: 1px solid var(--border); margin-top: 6px; padding-top: 8px; display: flex; gap: 6px; }
+  .emoji-popover .manual input { flex: 1; }
+
+  .top-actions { display: flex; gap: 8px; }
+  .empty-state { color: var(--text-muted); font-size: 13px; padding: 40px; text-align: center; }
+  .toast { position: fixed; bottom: 20px; right: 20px; background: var(--bg-card); border: 1px solid var(--border); padding: 10px 16px; border-radius: 6px; font-size: 13px; opacity: 0; transition: opacity 0.2s; pointer-events: none; }
+  .toast.show { opacity: 1; }
+  .toast.err { border-color: var(--danger); }
+</style>
+</head>
+<body>
+
+<div id="sidebar">
+  <header>
+    <h1>Editor de tema</h1>
+    <div class="guild" id="guildName">Cargando...</div>
+  </header>
+  <ul id="catlist"></ul>
+  <footer>
+    <button class="btn danger" id="resetAllBtn" style="width:100%">Restablecer todo</button>
+  </footer>
+</div>
+
+<div id="main">
+  <div id="main-header">
+    <h2 id="catTitle">Elegí una sección</h2>
+    <div class="top-actions" id="catActions"></div>
+  </div>
+  <div id="cards"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const CDN = 'https://cdn.discordapp.com/emojis/';
+let state = { categories: [], emojis: null, activeCategory: null };
+
+function emojiCdnUrl(e) { return CDN + e.id + '.' + (e.animated ? 'gif' : 'png') + '?size=32'; }
+
+function renderEmojiHtml(str) {
+  if (!str) return '';
+  const m = String(str).match(/^<a?:(\w+):(\d+)>$/);
+  if (m) {
+    const animated = str.startsWith('<a:');
+    return '<img class="emoji-inline" src="' + CDN + m[2] + '.' + (animated ? 'gif' : 'png') + '?size=32" alt="' + m[1] + '">';
+  }
+  return '<span>' + escapeHtml(str) + '</span>';
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+async function loadData() {
+  const res = await fetch('/api/data');
+  const data = await res.json();
+  state.categories = data.categories;
+  document.getElementById('guildName').textContent = data.guild ? data.guild.name : 'Sin servidor conectado';
+  renderSidebar();
+  if (!state.activeCategory && data.categories.length) selectCategory(data.categories[0].key);
+}
+
+async function loadEmojis() {
+  const res = await fetch('/api/emojis');
+  const data = await res.json();
+  state.emojis = data.emojis || [];
+}
+
+function renderSidebar() {
+  const ul = document.getElementById('catlist');
+  ul.innerHTML = '';
+  for (const cat of state.categories) {
+    const li = document.createElement('li');
+    const btn = document.createElement('button');
+    btn.className = cat.key === state.activeCategory ? 'active' : '';
+    btn.innerHTML = escapeHtml(cat.label) + '<span class="count">' + cat.items.length + '</span>';
+    btn.onclick = () => selectCategory(cat.key);
+    li.appendChild(btn);
+    ul.appendChild(li);
+  }
+}
+
+function selectCategory(key) {
+  state.activeCategory = key;
+  renderSidebar();
+  const cat = state.categories.find((c) => c.key === key);
+  document.getElementById('catTitle').textContent = cat.label;
+
+  const actions = document.getElementById('catActions');
+  actions.innerHTML = '';
+  const resetBtn = document.createElement('button');
+  resetBtn.className = 'btn small';
+  resetBtn.textContent = 'Restablecer esta sección';
+  resetBtn.onclick = () => resetCategory(key);
+  actions.appendChild(resetBtn);
+
+  const cards = document.getElementById('cards');
+  cards.innerHTML = '';
+  for (const item of cat.items) {
+    cards.appendChild(renderCard(cat, item));
+  }
+}
+
+function renderCard(cat, item) {
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.dataset.itemKey = item.key;
+
+  const title = document.createElement('div');
+  title.className = 'card-label';
+  title.textContent = item.label;
+  card.appendChild(title);
+
+  if (item.type === 'text' && cat.isColorCategory) {
+    card.appendChild(buildColorField(item));
+  } else if (item.type === 'text') {
+    card.appendChild(buildTextField(item));
+  } else if (item.type === 'label_emoji') {
+    card.appendChild(buildLabelEmojiField(item));
+  } else if (item.type === 'title_color') {
+    card.appendChild(buildTitleColorField(item));
+  }
+
+  return card;
+}
+
+function buildActionsRow(onSave) {
+  const row = document.createElement('div');
+  row.className = 'card-actions';
+  const btn = document.createElement('button');
+  btn.className = 'btn primary small';
+  btn.textContent = 'Guardar';
+  const status = document.createElement('span');
+  status.className = 'status-msg';
+  btn.onclick = async () => {
+    status.textContent = 'Guardando...';
+    status.className = 'status-msg';
+    const result = await onSave();
+    if (result && result.ok) {
+      status.textContent = 'Guardado';
+      status.className = 'status-msg ok';
+      showToast('Cambio guardado');
+    } else {
+      status.textContent = (result && result.error) || 'Error al guardar';
+      status.className = 'status-msg err';
+      showToast((result && result.error) || 'Error al guardar', true);
+    }
+    setTimeout(() => { status.textContent = ''; }, 3000);
+  };
+  row.appendChild(btn);
+  row.appendChild(status);
+  return row;
+}
+
+function buildTextField(item) {
+  const wrap = document.createElement('div');
+  const input = item.long ? document.createElement('textarea') : document.createElement('input');
+  if (!item.long) input.type = 'text';
+  input.value = item.value || '';
+
+  const row = document.createElement('div');
+  row.className = 'field-row';
+  row.appendChild(input);
+  row.appendChild(createInlineEmojiPicker(input));
+  wrap.appendChild(row);
+
+  const preview = document.createElement('div');
+  preview.className = 'preview-box';
+  preview.innerHTML = renderTextPreview(input.value);
+  wrap.appendChild(preview);
+
+  input.addEventListener('input', () => { preview.innerHTML = renderTextPreview(input.value); });
+
+  wrap.appendChild(buildActionsRow(() => saveItem(item.key, { value: input.value })));
+  return wrap;
+}
+
+function renderTextPreview(text) {
+  if (!text) return '<span style="color:var(--text-muted)">(vacío)</span>';
+  return escapeHtml(text).replace(/\n/g, '<br>').replace(/\{(\w+)\}/g, '<b style="color:var(--accent)">{$1}</b>');
+}
+
+function buildColorField(item) {
+  const wrap = document.createElement('div');
+  const row = document.createElement('div');
+  row.className = 'field-row';
+
+  const colorInput = document.createElement('input');
+  colorInput.type = 'color';
+  colorInput.value = /^#[0-9A-Fa-f]{6}$/.test(item.value) ? item.value : '#5865f2';
+
+  const hexInput = document.createElement('input');
+  hexInput.type = 'text';
+  hexInput.className = 'hex-input';
+  hexInput.value = item.value || '';
+
+  colorInput.addEventListener('input', () => { hexInput.value = colorInput.value.toUpperCase(); });
+  hexInput.addEventListener('input', () => {
+    if (/^#[0-9A-Fa-f]{6}$/.test(hexInput.value)) colorInput.value = hexInput.value;
+  });
+
+  row.appendChild(colorInput);
+  row.appendChild(hexInput);
+  wrap.appendChild(row);
+  wrap.appendChild(buildActionsRow(() => saveItem(item.key, { value: hexInput.value })));
+  return wrap;
+}
+
+function buildTitleColorField(item) {
+  const wrap = document.createElement('div');
+  const row = document.createElement('div');
+  row.className = 'field-row';
+
+  const titleInput = document.createElement('input');
+  titleInput.type = 'text';
+  titleInput.value = item.title || '';
+  titleInput.style.flex = '1';
+
+  const colorInput = document.createElement('input');
+  colorInput.type = 'color';
+  colorInput.value = /^#[0-9A-Fa-f]{6}$/.test(item.color) ? item.color : '#5865f2';
+
+  const hexInput = document.createElement('input');
+  hexInput.type = 'text';
+  hexInput.className = 'hex-input';
+  hexInput.value = item.color || '';
+
+  colorInput.addEventListener('input', () => { hexInput.value = colorInput.value.toUpperCase(); updatePreview(); });
+  hexInput.addEventListener('input', () => {
+    if (/^#[0-9A-Fa-f]{6}$/.test(hexInput.value)) colorInput.value = hexInput.value;
+    updatePreview();
+  });
+
+  row.appendChild(titleInput);
+  row.appendChild(createInlineEmojiPicker(titleInput));
+  row.appendChild(colorInput);
+  row.appendChild(hexInput);
+  wrap.appendChild(row);
+
+  const preview = document.createElement('div');
+  preview.className = 'preview-box';
+  wrap.appendChild(preview);
+
+  function updatePreview() {
+    preview.style.borderLeftColor = /^#[0-9A-Fa-f]{6}$/.test(hexInput.value) ? hexInput.value : 'var(--accent)';
+    preview.innerHTML = '<b>' + escapeHtml(titleInput.value || '(sin título)') + '</b>';
+  }
+  titleInput.addEventListener('input', updatePreview);
+  updatePreview();
+
+  wrap.appendChild(buildActionsRow(() => saveItem(item.key, { title: titleInput.value, color: hexInput.value })));
+  return wrap;
+}
+
+function createEmojiPickerButton({ includeNone, onPickGuildEmoji, onNone, onManual, manualPlaceholder, buttonHtml }) {
+  const wrap = document.createElement('div');
+  wrap.className = 'emoji-picker-wrap';
+
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'btn';
+  btn.innerHTML = buttonHtml || '😀 Emoji';
+  wrap.appendChild(btn);
+
+  const popover = document.createElement('div');
+  popover.className = 'emoji-popover';
+  wrap.appendChild(popover);
+
+  async function open() {
+    if (!state.emojis) await loadEmojis();
+    popover.innerHTML = '';
+
+    if (includeNone) {
+      const noneOpt = document.createElement('div');
+      noneOpt.className = 'none-opt';
+      noneOpt.textContent = '🚫 Sin emoji';
+      noneOpt.onclick = () => { onNone(); popover.classList.remove('open'); };
+      popover.appendChild(noneOpt);
+    }
+
+    const grid = document.createElement('div');
+    grid.className = 'emoji-grid';
+    for (const e of state.emojis) {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.title = e.name;
+      b.innerHTML = '<img src="' + emojiCdnUrl(e) + '" alt="' + e.name + '">';
+      b.onclick = () => { onPickGuildEmoji(e); popover.classList.remove('open'); };
+      grid.appendChild(b);
+    }
+    popover.appendChild(grid);
+
+    if (!state.emojis.length) {
+      const none = document.createElement('div');
+      none.style.cssText = 'padding:8px;color:var(--text-muted);font-size:12px;';
+      none.textContent = 'Este servidor no tiene emojis personalizados todavía.';
+      popover.appendChild(none);
+    }
+
+    if (onManual) {
+      const manual = document.createElement('div');
+      manual.className = 'manual';
+      const manualInput = document.createElement('input');
+      manualInput.type = 'text';
+      manualInput.placeholder = manualPlaceholder || 'Unicode 🎫 o <:nombre:id>';
+      const manualBtn = document.createElement('button');
+      manualBtn.className = 'btn small';
+      manualBtn.textContent = 'Usar';
+      manualBtn.onclick = () => { onManual(manualInput.value.trim()); popover.classList.remove('open'); };
+      manual.appendChild(manualInput);
+      manual.appendChild(manualBtn);
+      popover.appendChild(manual);
+    }
+
+    popover.classList.add('open');
+  }
+
+  btn.onclick = (ev) => {
+    ev.stopPropagation();
+    if (popover.classList.contains('open')) popover.classList.remove('open');
+    else open();
+  };
+  document.addEventListener('click', (ev) => {
+    if (!wrap.contains(ev.target)) popover.classList.remove('open');
+  });
+
+  return { wrap, btn, popover };
+}
+
+function insertAtCursor(el, text) {
+  const start = el.selectionStart ?? el.value.length;
+  const end = el.selectionEnd ?? el.value.length;
+  el.value = el.value.slice(0, start) + text + el.value.slice(end);
+  const newPos = start + text.length;
+  el.focus();
+  el.setSelectionRange(newPos, newPos);
+  el.dispatchEvent(new Event('input', { bubbles: true }));
+}
+
+function createInlineEmojiPicker(targetInput) {
+  const picker = createEmojiPickerButton({
+    includeNone: false,
+    buttonHtml: '😀',
+    manualPlaceholder: 'Emoji unicode, ej: 🎫',
+    onPickGuildEmoji: (e) => insertAtCursor(targetInput, '<' + (e.animated ? 'a' : '') + ':' + e.name + ':' + e.id + '>'),
+    onManual: (text) => { if (text) insertAtCursor(targetInput, text); },
+  });
+  picker.btn.className = 'btn small';
+  return picker.wrap;
+}
+
+function buildLabelEmojiField(item) {
+  const wrap = document.createElement('div');
+  const row = document.createElement('div');
+  row.className = 'field-row';
+
+  const labelInput = document.createElement('input');
+  labelInput.type = 'text';
+  labelInput.value = item.label || '';
+  labelInput.style.flex = '1';
+  labelInput.placeholder = 'Texto del botón';
+
+  let pendingEmoji = { emojiGuildId: null, emoji: item.emoji || '', clear: false };
+
+  function currentEmojiHtml() {
+    if (pendingEmoji.emojiGuildId && state.emojis) {
+      const e = state.emojis.find((x) => x.id === pendingEmoji.emojiGuildId);
+      if (e) return '<img class="emoji-inline" src="' + emojiCdnUrl(e) + '">';
+    }
+    if (pendingEmoji.clear) return '';
+    return renderEmojiHtml(pendingEmoji.emoji);
+  }
+
+  const picker = createEmojiPickerButton({
+    includeNone: true,
+    manualPlaceholder: 'Unicode 🎫 o <:nombre:id>',
+    onPickGuildEmoji: (e) => { pendingEmoji = { emojiGuildId: e.id, emoji: '', clear: false }; updateBtnLabel(); updatePreview(); },
+    onNone: () => { pendingEmoji = { emojiGuildId: null, emoji: '', clear: true }; updateBtnLabel(); updatePreview(); },
+    onManual: (text) => { pendingEmoji = { emojiGuildId: null, emoji: text, clear: false }; updateBtnLabel(); updatePreview(); },
+  });
+
+  row.appendChild(labelInput);
+  row.appendChild(picker.wrap);
+  wrap.appendChild(row);
+
+  const preview = document.createElement('div');
+  preview.className = 'preview-box';
+  const previewLabel = document.createElement('div');
+  previewLabel.className = 'preview-label';
+  previewLabel.textContent = 'Así se ve el botón';
+  preview.appendChild(previewLabel);
+  const previewBtn = document.createElement('span');
+  previewBtn.className = 'discord-btn style-' + (item.style || 'Secondary');
+  preview.appendChild(previewBtn);
+  wrap.appendChild(preview);
+
+  function updateBtnLabel() {
+    picker.btn.innerHTML = (currentEmojiHtml() || '🙂') + ' Emoji';
+  }
+
+  function updatePreview() {
+    previewBtn.innerHTML = currentEmojiHtml() + ' ' + escapeHtml(labelInput.value || 'Sin texto');
+  }
+
+  labelInput.addEventListener('input', updatePreview);
+  updateBtnLabel();
+  updatePreview();
+
+  wrap.appendChild(buildActionsRow(() => {
+    const values = { label: labelInput.value };
+    if (pendingEmoji.emojiGuildId) values.emojiGuildId = pendingEmoji.emojiGuildId;
+    else if (pendingEmoji.clear) values.emojiClear = true;
+    else values.emoji = pendingEmoji.emoji;
+    return saveItem(item.key, values);
+  }));
+
+  return wrap;
+}
+
+async function saveItem(itemKey, values) {
+  const res = await fetch('/api/set', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ itemKey, values }),
+  });
+  const data = await res.json();
+  if (data.ok) {
+    for (const cat of state.categories) {
+      const it = cat.items.find((i) => i.key === itemKey);
+      if (it && data.value) Object.assign(it, data.value);
+    }
+  }
+  return data;
+}
+
+async function resetCategory(key) {
+  if (!confirm('¿Restablecer todos los campos de esta sección a sus valores por defecto?')) return;
+  const res = await fetch('/api/reset-category', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ categoryKey: key }),
+  });
+  const data = await res.json();
+  if (data.ok) {
+    const idx = state.categories.findIndex((c) => c.key === key);
+    state.categories[idx] = data.category;
+    selectCategory(key);
+    showToast('Sección restablecida');
+  }
+}
+
+async function resetAllTheme() {
+  if (!confirm('¿Restablecer TODO el tema a los valores por defecto? Esta acción no se puede deshacer.')) return;
+  const res = await fetch('/api/reset-all', { method: 'POST' });
+  const data = await res.json();
+  if (data.ok) {
+    state.categories = data.categories;
+    selectCategory(state.activeCategory);
+    showToast('Tema restablecido por completo');
+  }
+}
+
+function showToast(msg, isErr) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.className = 'toast show' + (isErr ? ' err' : '');
+  setTimeout(() => { toast.className = 'toast'; }, 2500);
+}
+
+document.getElementById('resetAllBtn').onclick = resetAllTheme;
+
+loadData();
+loadEmojis();
+</script>
+</body>
+</html>
