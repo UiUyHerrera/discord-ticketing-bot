@@ -22,4 +22,12 @@ function pick(language, en, es) {
   return language === 'es' ? es : en;
 }
 
-module.exports = { getTicketTheme, pick };
+function resolveCategory(category, language) {
+  const translated = getTicketTheme(language).ticket.categories[category.key];
+  return {
+    label: (translated && translated.label) || category.label,
+    description: (translated && translated.description) || category.description,
+  };
+}
+
+module.exports = { getTicketTheme, pick, resolveCategory };

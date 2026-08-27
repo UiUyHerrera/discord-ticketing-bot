@@ -8,6 +8,7 @@ const configService = require('./configService');
 const transcriptService = require('./transcriptService');
 const logService = require('./logService');
 const { ticketChannelName, buildTicketEmbed, buildTicketActionRows } = require('./ticketView');
+const { resolveCategory } = require('./ticketTheme');
 
 const { Flags } = PermissionsBitField;
 
@@ -71,7 +72,7 @@ async function createTicketChannel({ guild, member, guildConfig, category, langu
     number,
     userId: member.id,
     categoryKey: category.key,
-    categoryLabel: category.label,
+    categoryLabel: resolveCategory(category, language).label,
     language,
   });
 

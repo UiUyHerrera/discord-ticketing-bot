@@ -10,7 +10,7 @@ const {
 const { build } = require('../utils/ids');
 const { discordTimestamp } = require('../utils/time');
 const config = require('../config');
-const { getTicketTheme } = require('./ticketTheme');
+const { getTicketTheme, resolveCategory } = require('./ticketTheme');
 
 function pad(number) {
   return String(number).padStart(config.ticketNumberPadding, '0');
@@ -100,12 +100,15 @@ function buildCategorySelectRow(categories, language) {
     .setCustomId(build('ticket', 'categoryselect', language))
     .setPlaceholder(theme.ticket.categorySelectPlaceholder)
     .addOptions(
-      categories.map((cat) => ({
-        label: cat.label,
-        value: cat.key,
-        description: cat.description ? cat.description.slice(0, 100) : undefined,
-        emoji: cat.emoji || undefined,
-      }))
+      categories.map((cat) => {
+        const { label, description } = resolveCategory(cat, language);
+        return {
+          label,
+          value: cat.key,
+          description: description ? description.slice(0, 100) : undefined,
+          emoji: cat.emoji || undefined,
+        };
+      })
     );
   return new ActionRowBuilder().addComponents(menu);
 }

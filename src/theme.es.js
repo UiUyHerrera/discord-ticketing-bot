@@ -28,6 +28,15 @@ const ticket = {
   panelFooter: 'Sistema de Tickets',
   categorySelectPlaceholder: 'Selecciona el motivo de tu ticket',
 
+  categories: {
+    compra: { label: 'Compra', description: 'Quiero comprar algo.' },
+    venta: { label: 'Venta', description: 'Quiero vender algo.' },
+    pago: { label: 'Pago / Retiro', description: 'Gestionar un pago o retiro.' },
+    soporte: { label: 'Soporte', description: 'Necesito ayuda o soporte.' },
+    negocio: { label: 'Negocios', description: 'Propuesta de negocio.' },
+    reporte: { label: 'Reporte', description: 'Reportar un problema o usuario.' },
+  },
+
   embedTitleTemplate: 'Ticket #{number}',
   embedDescriptionTemplate: 'Hola {user}\nGracias por contactar con nuestro equipo.\nUn miembro del staff te atenderá lo antes posible.',
   embedFooterTemplate: 'Ticket #{number}',

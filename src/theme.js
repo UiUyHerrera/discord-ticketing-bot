@@ -101,6 +101,15 @@ const ticket = {
   panelFooter: 'Ticket System',
   categorySelectPlaceholder: 'Select the reason for your ticket',
 
+  categories: {
+    compra: { label: 'Buy', description: 'I want to buy something.' },
+    venta: { label: 'Sell', description: 'I want to sell something.' },
+    pago: { label: 'Payment / Withdrawal', description: 'Manage a payment or withdrawal.' },
+    soporte: { label: 'Support', description: 'I need help or support.' },
+    negocio: { label: 'Business', description: 'Business proposal.' },
+    reporte: { label: 'Report', description: 'Report a problem or user.' },
+  },
+
   embedTitleTemplate: 'Ticket #{number}',
   embedDescriptionTemplate: 'Hello {user}\nThanks for contacting our team.\nA staff member will assist you shortly.',
   embedFooterTemplate: 'Ticket #{number}',
