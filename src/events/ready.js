@@ -1,6 +1,6 @@
 'use strict';
 
-const { ActivityType, Events } = require('discord.js');
+const { Events } = require('discord.js');
 const logger = require('../utils/logger');
 const configService = require('../services/configService');
 
@@ -17,11 +17,6 @@ module.exports = {
         logger.error(`No se pudo inicializar configuración para ${guild.id}:`, err);
       }
     }
-
-    client.user.setPresence({
-      activities: [{ name: 'tickets | /ticket setup', type: ActivityType.Watching }],
-      status: 'online',
-    });
 
     logger.info(`Bot activo en ${client.guilds.cache.size} servidor(es).`);
   },
