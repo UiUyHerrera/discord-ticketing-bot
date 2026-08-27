@@ -20,6 +20,8 @@ module.exports = {
 
   defaultCooldownSeconds: 30,
 
+  ephemeralTtlSeconds: 300,
+
   defaultTicketName: 'ticket',
 
   ticketNumberPadding: 4,
