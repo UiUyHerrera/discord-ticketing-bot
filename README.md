@@ -18,8 +18,8 @@ Everything that the bot says (labels, embeds, colors, emojis) can be edited at r
 npm install
 ```
 
-`better-sqlite3` is a native module. On Windows it may need the "Desktop development with C++"
-workload from the Visual Studio Build Tools; on Debian/Ubuntu, `build-essential` and `python3`.
+`better-sqlite3` ships prebuilt N-API binaries for Windows, macOS and Linux, so no C++ toolchain is
+required.
 
 ## Discord application
 
@@ -150,8 +150,5 @@ console output.
 and its role must be above the staff roles.
 
 **"database is locked".** Two instances of the bot are running against the same SQLite file.
-
-**`better-sqlite3` fails to install.** Install a C++ toolchain: Visual Studio Build Tools on Windows,
-`xcode-select --install` on macOS, `build-essential python3` on Debian/Ubuntu.
 
 **Ticket numbering.** Numbers are never reused. Change the next number from `/ticket setup`.
