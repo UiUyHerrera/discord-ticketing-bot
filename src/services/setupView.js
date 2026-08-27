@@ -67,7 +67,7 @@ function renderMainPanel(guildConfig, categoriesCount) {
     themedButton(build('setup', 'field', 'color'), ButtonStyle.Secondary, t.buttons.color)
   );
   const row4 = new ActionRowBuilder().addComponents(
-    themedButton(build('setup', 'field', 'panelMessage'), ButtonStyle.Secondary, t.buttons.panelMessage),
+    themedButton(build('setup', 'field', 'panelImage'), ButtonStyle.Secondary, t.buttons.panelImage),
     themedButton(build('setup', 'finish'), ButtonStyle.Success, t.buttons.finish)
   );
 

@@ -15,7 +15,7 @@ async function reRender(interaction) {
 }
 
 module.exports = {
-  customIds: ['name', 'counter', 'color', 'panelMessage'].map((key) => build('setup', 'modal', key)),
+  customIds: ['name', 'counter', 'color', 'panelImage'].map((key) => build('setup', 'modal', key)),
   async execute(interaction) {
     if (!isAdmin(interaction.member)) {
       await interaction.reply({ embeds: [errorEmbed('You need the "Manage Server" permission to use this.')], ephemeral: true });
@@ -62,9 +62,7 @@ module.exports = {
       return;
     }
 
-    if (fieldKey === 'panelMessage') {
-      const title = interaction.fields.getTextInputValue('title').trim();
-      const description = interaction.fields.getTextInputValue('description').trim();
+    if (fieldKey === 'panelImage') {
       const image = interaction.fields.getTextInputValue('image').trim();
 
       if (image && !/^https?:\/\//i.test(image)) {
@@ -72,11 +70,7 @@ module.exports = {
         return;
       }
 
-      configService.updateGuildConfig(guildId, {
-        panel_title: title,
-        panel_description: description,
-        panel_image: image || null,
-      });
+      configService.updateGuildConfig(guildId, { panel_image: image || null });
       await reRender(interaction);
     }
   },

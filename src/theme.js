@@ -61,7 +61,7 @@ const setup = {
     name: { label: 'Ticket Name', emoji: null },
     counter: { label: 'Starting Number', emoji: null },
     color: { label: 'Color', emoji: null },
-    panelMessage: { label: 'Panel Message', emoji: null },
+    panelImage: { label: 'Panel Image', emoji: null },
     finish: { label: 'Finish', emoji: null },
     back: { label: 'Back', emoji: null },
   },
@@ -90,10 +90,8 @@ const setup = {
     counterLabel: 'Next ticket number to use',
     colorTitle: 'Embed color',
     colorLabel: 'Hex color (e.g. #808080)',
-    panelMessageTitle: 'Panel message',
-    panelMessageTitleLabel: 'Panel title',
-    panelMessageDescriptionLabel: 'Panel description',
-    panelMessageImageLabel: 'Image URL (optional)',
+    panelImageTitle: 'Panel image',
+    panelImageLabel: 'Image URL (leave empty to remove)',
   },
 };
 

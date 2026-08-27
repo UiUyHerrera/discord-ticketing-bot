@@ -77,11 +77,10 @@ function buildTicketActionRows(ticket) {
 
 function buildPanelEmbed(guildConfig, language) {
   const t = getTicketTheme(language).ticket;
-  const useCustomText = language === 'es';
   const embed = new EmbedBuilder()
     .setColor(guildConfig.embed_color || config.defaultColor)
-    .setTitle((useCustomText && guildConfig.panel_title) || t.defaultPanelTitle)
-    .setDescription((useCustomText && guildConfig.panel_description) || t.defaultPanelDescription)
+    .setTitle(t.defaultPanelTitle)
+    .setDescription(t.defaultPanelDescription)
     .setFooter({ text: t.panelFooter })
     .setTimestamp();
 

@@ -7,7 +7,7 @@ const { errorEmbed } = require('../utils/embeds');
 const configService = require('../services/configService');
 const theme = require('../services/liveTheme');
 
-const FIELDS = ['name', 'counter', 'color', 'panelMessage'];
+const FIELDS = ['name', 'counter', 'color', 'panelImage'];
 
 function buildModal(fieldKey, guildConfig) {
   const m = theme.setup.modals;
@@ -60,31 +60,13 @@ function buildModal(fieldKey, guildConfig) {
     return modal;
   }
 
-  if (fieldKey === 'panelMessage') {
-    const modal = new ModalBuilder().setCustomId(build('setup', 'modal', 'panelMessage')).setTitle(m.panelMessageTitle);
+  if (fieldKey === 'panelImage') {
+    const modal = new ModalBuilder().setCustomId(build('setup', 'modal', 'panelImage')).setTitle(m.panelImageTitle);
     modal.addComponents(
       new ActionRowBuilder().addComponents(
         new TextInputBuilder()
-          .setCustomId('title')
-          .setLabel(m.panelMessageTitleLabel)
-          .setStyle(TextInputStyle.Short)
-          .setValue(guildConfig.panel_title || theme.ticket.defaultPanelTitle)
-          .setRequired(true)
-          .setMaxLength(256)
-      ),
-      new ActionRowBuilder().addComponents(
-        new TextInputBuilder()
-          .setCustomId('description')
-          .setLabel(m.panelMessageDescriptionLabel)
-          .setStyle(TextInputStyle.Paragraph)
-          .setValue(guildConfig.panel_description || '')
-          .setRequired(true)
-          .setMaxLength(1000)
-      ),
-      new ActionRowBuilder().addComponents(
-        new TextInputBuilder()
           .setCustomId('image')
-          .setLabel(m.panelMessageImageLabel)
+          .setLabel(m.panelImageLabel)
           .setStyle(TextInputStyle.Short)
           .setValue(guildConfig.panel_image || '')
           .setRequired(false)
