@@ -1,3 +1,98 @@
+# Discord Ticketing Bot
+
+Sistema de tickets de soporte para servidores de Discord, desarrollado con discord.js v14 y SQLite. Los usuarios abren tickets desde un panel público; el equipo puede reclamarlos, bloquearlos, generar transcripciones y cerrarlos desde botones.
+
+[English version](#english)
+
+## Funciones
+
+- Panel público y categorías de tickets configurables.
+- Asignación, bloqueo, reapertura, cierre y eliminación de tickets.
+- Gestión de participantes y generación de transcripciones.
+- Registro de actividad, estadísticas y lista de bloqueo.
+- Personalización en caliente de textos, emojis y colores mediante comandos o editor web local.
+- Persistencia local con SQLite; no requiere una base de datos externa.
+
+## Requisitos
+
+- Node.js 18 o superior (recomendado: 20 o 22).
+- Aplicación y bot de Discord.
+
+## Instalación y configuración
+
+~~~bash
+npm install
+~~~
+
+Copia .env.example a .env y configura DISCORD_TOKEN y CLIENT_ID. GUILD_ID es opcional para registrar comandos inmediatamente en un servidor de prueba. DATABASE_PATH, WEB_ENABLED y WEB_PORT también son opcionales; consulta la tabla de variables en el archivo .env.example.
+
+En el portal de desarrolladores de Discord, habilita los intents privilegiados Server Members y Message Content. Invita el bot con los scopes bot y applications.commands, y los permisos para ver/administrar canales, administrar roles, enviar mensajes, insertar enlaces, adjuntar archivos y leer el historial. El rol del bot debe estar por encima de los roles del equipo.
+
+## Ejecutar
+
+~~~bash
+npm run deploy
+npm start
+~~~
+
+Vuelve a ejecutar npm run deploy cuando cambies los comandos. npm run dev inicia el bot con recarga automática. El primer uso se configura con /ticket setup; luego publica el panel con /ticket panel.
+
+## Comandos
+
+Todos los comandos pertenecen a /ticket. setup, panel, config y theme son para administradores; close, delete, add/remove, claim/unclaim, lock/unlock, rename, transcript, user, stats y blacklist/unblacklist están sujetos a permisos del ticket o del equipo. Los canales incluyen botones para las acciones más frecuentes.
+
+## Editor de tema y despliegue
+
+El editor se sirve en http://localhost:3001 y solo escucha en 127.0.0.1. Los cambios se aplican inmediatamente y se guardan en SQLite. En servidores compartidos, configura WEB_ENABLED=false.
+
+Para bot-hosting.net, usa Node.js 20 o 22, npm start y src/index.js. Configura DISCORD_TOKEN, CLIENT_ID y WEB_ENABLED=false como variables del panel; no subas .env ni archivos de datos. Registra los comandos desde la consola con node deploy-commands.js.
+
+## English
+
+A Discord support-ticket system built with discord.js v14 and SQLite. Users open tickets through a public panel; staff can claim, lock, transcript, close, reopen, and delete tickets using channel buttons.
+
+### Features
+
+- Public ticket panel and configurable categories.
+- Ticket assignment, locking, reopening, closing, and deletion.
+- Participant management and transcript generation.
+- Activity logs, statistics, and blacklist management.
+- Live editing of text, emoji, and colors through commands or a local web editor.
+- Local SQLite storage; no external database is required.
+
+### Requirements
+
+- Node.js 18 or newer (20 or 22 recommended).
+- A Discord application with a bot user.
+
+### Install and configure
+
+~~~bash
+npm install
+~~~
+
+Copy .env.example to .env and set DISCORD_TOKEN and CLIENT_ID. GUILD_ID is optional and enables immediate command registration in a test server. DATABASE_PATH, WEB_ENABLED, and WEB_PORT are optional; see .env.example for details.
+
+In the Discord Developer Portal, enable the privileged Server Members and Message Content intents. Invite the bot with the bot and applications.commands scopes and permissions to view/manage channels, manage roles, send messages, embed links, attach files, and read message history. Place the bot role above staff roles.
+
+### Run
+
+~~~bash
+npm run deploy
+npm start
+~~~
+
+Run npm run deploy again whenever commands change. npm run dev starts the bot with automatic reloading. Use /ticket setup for the initial configuration, then publish the panel with /ticket panel.
+
+### Commands
+
+All commands are subcommands of /ticket. setup, panel, config, and theme are for administrators; close, delete, add/remove, claim/unclaim, lock/unlock, rename, transcript, user, stats, and blacklist/unblacklist are available according to ticket or staff permissions. Ticket channels include buttons for common actions.
+
+### Theme editor and deployment
+
+The editor is served at http://localhost:3001 and binds only to 127.0.0.1. Changes apply immediately and are stored in SQLite. Set WEB_ENABLED=false on shared hosting.
+
+For bot-hosting.net, choose Node.js 20 or 22, use npm start and src/index.js, and set DISCORD_TOKEN, CLIENT_ID, and WEB_ENABLED=false as panel variables. Do not upload .env or data files. Register commands from the console with node deploy-commands.js.
 # Ticket Bot
 
 A Discord support-ticket system built with discord.js v14 and SQLite. Users open tickets from a
